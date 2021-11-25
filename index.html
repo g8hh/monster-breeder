@@ -1,0 +1,524 @@
+
+<html>
+<head>
+<title>Monster Breeder</title>
+<meta name="description" content="A browser-based text-sim game about capturing scary monsters and having them make cute babies."/>
+
+<style>
+:root {
+  --main-base-color: #000000;
+  --gui-color: #000000;
+  --gui-highlight: #AA00AA;
+  --gui-shadow: #550055;
+  --button-color: #000000;
+  --button-highlight: #00AA00;
+  --button-shadow: #005500;
+  --link-color: #00AA00;
+  --link-hover: #AAFFAA;
+  --x-color: #000000;
+  --x-highlight: #00AAAA;
+  --x-shadow: #005555;
+  --x-hover: #AAFFFF;
+  --text-color: #AA00AA;
+  --map-wall: #000000;
+  --map-spot: #000000;
+  --map-path: #00AAAA;
+  --map-periph: #005555;
+  --nav-color: #000000;
+  --speech-color: #AAAAAA;
+}
+::-webkit-scrollbar {    width: 10px; }
+::-webkit-scrollbar-track {   background: #005500; }
+::-webkit-scrollbar-thumb {   background: #00AA00; }
+::-webkit-scrollbar-thumb:hover {    background: #AAFFAA; }
+
+html{
+  height:100%;
+  }
+body {
+    font-family: Arial, Helvetica, sans-serif;
+    background: var(--main-base-color);
+    color: #000000;
+    color: var(--text-color);
+    min-height: 100%;
+    height: 100%;
+    margin:0px;
+    overflow-x: hidden;
+    margin-right: calc(-1 * (100vw - 100%));
+    }
+p {
+  margin: 0px;
+  padding: 0px 5px;
+}
+
+#Over {
+    background: url('art/title.png')  no-repeat center;
+    height:127px;
+    width:100%;
+    padding-top:20px;
+    padding-bottom:10px;
+    margin-bottom: 0px;
+    text-align:center;
+    position:relative;
+}
+#Stats {
+    background: var(--main-base-color);
+    color: var(--button-highlight);
+    min-width:660px;
+    margin:0 auto;
+    font-size: 20px;
+    font-family: "Courier New", Courier, monospace;
+    font-weight: bold;
+    cursor:pointer;
+}
+#MenuBar {
+    color: var(--button-highlight);
+    margin:0 auto; text-align:right; font-size:16px;
+    min-width:660px;
+    //cursor:pointer;
+  }
+#Main {
+    max-height: 999999px;
+    background: var(--gui-color);
+    font-weight: normal;
+    font-size: 24px;     //1rem;
+    text-align:left;
+    line-height: 1.2;
+    margin: 0 auto;
+    margin-top:5px;
+    margin-bottom:10px;
+    padding:5px;
+    min-width:660px;
+    max-width:95%;
+    border: 2px solid var(--gui-highlight);
+    border-radius: 10px;
+    box-shadow: 0px 0px 12px 5px var(--gui-shadow);
+}
+
+#Under, #UnderUnder { 
+    font-family: Arial, Helvetica, sans-serif;
+    font-size: 24px;
+    line-height: 1.4;
+    text-transform: uppercase;
+    min-width:660px;
+    width:47%;
+}
+#Under{
+    //max-height:60%;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: center;
+    text-align:center;
+    flex-direction: column;
+}
+#UnderUnder {
+    margin-bottom:26px;
+    display:inline-block;
+}
+
+#Under.column { 
+  //width:60%;
+  flex-direction: row;
+}
+
+#Settings {
+  height:80px;
+  display:inline-block;
+  font-size: 16px;
+}
+#footer {
+  font-size:22px;
+  width:100%;
+  left:0px;
+  padding: 0px 25px;
+  bottom:40px;
+  //vertical-align: text-top;
+  height:0px;
+  position:relative;
+  color: var(--gui-highlight);;
+  float:left;
+}
+
+#savetext {
+  float:right;
+  font-size: 0.66em;
+}
+#tiptext {
+  float:right;
+  font-size: 0.66em;
+  position:relative;
+}
+#tip {
+  width:400;
+  position:absolute;
+  z-index: 1000;
+  right:0;
+  bottom:0;
+  padding: 5px;
+  background: var(--button-color);
+  color: var(--link-color);
+  border: 2px solid var(--button-highlight);
+  border-radius: 10px;
+  box-shadow: 0px 0px 12px 5px var(--button-shadow);
+  //font-size: 0.66em;
+}
+
+.Opt {
+  min-width: 660px; 
+  width:100%;
+  //max-width:95%; 
+  flex-direction: column;
+  position:relative;
+  margin: 5px 2px;
+  padding:2px 5px;
+  background: var(--button-color);
+  color: var(--link-color);
+  border: 2px solid var(--button-highlight);
+  border-radius: 10px;
+  box-shadow: 0px 0px 12px 5px var(--button-shadow);
+}
+
+.XOpt {
+  background: var(--x-color);
+  color: var(--x-highlight);
+  border: 2px solid var(--x-highlight);  
+  box-shadow: 0px 0px 12px 5px var(--x-shadow);  
+}
+
+
+.Direction,.Opt,#tip { touch-action: manipulation; cursor: pointer; }
+
+.optnum {
+  position:absolute;
+  //float: left;
+  font-size:12px;
+  font-weight:normal;
+}
+
+.vline { background: var(--button-highlight);
+  width:2px; height:25px; display:inline-block;
+}
+.hline { background: var(--button-highlight);
+  width:45px; height:2px; display:inline-block;
+}
+
+td {
+  text-align:center;
+  padding: 1px;
+  //font-family: "Avant Garde", "Courier New", Courier, monospace;
+  font-weight: bold;
+}
+a.bluelink{
+  color: var(--x-highlight) !important;
+  }
+a.bluelink:hover{
+  color: var(--x-hover) !important;
+  }
+//td a:link {  color: var(--link-color); }
+
+
+#nav {
+  height:auto;
+  width:95%;
+  background: var(--nav-color);
+  border: 2px solid var(--gui-highlight);
+  border-radius: 10px;
+  padding: 12px 0px;
+  margin-top:10px;
+  margin-bottom: 8px;
+  position:relative;
+  box-shadow: 0px 0px 12px 5px var(--gui-shadow) inset;  
+}
+#navbox,#mapbox {
+  //width:50%;
+  margin: 0px 15px;
+  text-align:center;
+  display:inline-block;
+  vertical-align:middle;
+}
+.Direction,.DirectionBlocked {
+  width:80px;
+  height:50px;
+  position:relative;
+  line-height:36px;
+  font-size: 36px;
+  font-weight:bold;
+  margin: 3px 3px; //margin:0px;
+  padding:5px 5px;
+  border-radius: 10px;  
+  display:inline-block;
+  overflow:hidden;
+  text-align:center;
+  color: var(--link-color);
+  background: var(--button-color);
+  border: 2px solid var(--button-highlight);
+  box-shadow: 0px 0px 12px 5px var(--button-shadow);
+  -webkit-touch-callout: none;  -webkit-user-select: none; -moz-user-select: none; -ms-user-select: none; user-select: none;
+}
+.DirectionBlocked {
+  background: var(--button-color);
+  border: 2px solid var(--button-shadow);
+}
+.markbutton {
+  float:right; margin-right:10px; width:auto; height:auto; line-height:12px; font-size:12px;
+  position:absolute;
+  bottom:13px;
+  right: 5px;
+  box-shadow: 0px 0px 12px 5px var(--button-shadow);
+}
+
+#maptile {
+  display:inline-block;
+  line-height:17px;
+  width:17px; height:17px;
+  margin:0px; padding:0px;
+  overflow:hidden;
+  font-size:20px;
+}
+.mapblank {  background:# var(--main-base-color); content: "�"}
+.mapwall {  background:var(--map-wall); }
+.mapperiph {  background:var(--map-periph);}
+.mappath {  background:var(--map-path);  color:var(--gui-highlight); }
+.mapyou:before { color:var(--map-spot); content: "+" }
+//.mapE:after { color:#00FFFF; content: "\25CF" }
+//.mapM:after { color:#FFFF00; content: "\2219" }
+.mapE {background:#00FFFF;    box-shadow: 0px 0px 0px 3px var(--map-path) inset; }
+.mapM {background:#FFFF00;    box-shadow: 0px 0px 0px 6px var(--map-path) inset; }
+
+#cht { display:none }
+
+#monsterimagecontainer {
+	width: 100%;
+	max-width: 300px;
+	margin: 10px auto;
+	pointer-events: none;
+	overflow:hidden;
+	background: var(--gui-highlight);
+	border-radius: 10px;
+	border: 10px solid #000;
+	box-shadow: 0px 0px 12px 1px #000000
+}
+
+#blackimage {
+	text-align:center;
+  margin-left: auto;
+  margin-right: auto;	
+	background: black;
+	mix-blend-mode: multiply;
+	position:relative;
+	padding-bottom:15px;
+  height:265px;
+  //border-radius: 10px;
+	//box-shadow: 0px 0px 12px 5px var(--gui-highlight) inset;
+}
+#imagespacer {
+  height:250px;
+  display:inline-block;
+  vertical-align:middle; 
+}
+#monsterimage {
+  margin: 0px 15px;
+  display:inline-block;
+  vertical-align:middle;  
+  overflow:hidden;
+  position:relative;
+}
+
+#monsterbody {
+	display:inline-block;
+	background-repeat: no-repeat;
+}
+#monsterhead {
+    position:absolute;
+    left:0;
+    right:0;
+    margin-left:auto;
+    margin-right:auto; 
+    display: block;
+}
+#monsterbod {
+    left:0;
+    right:0;
+    margin-left:auto;
+    margin-right:auto; 
+}
+
+#monsterhead, #monsterbod {
+  width: 200px;
+  height: auto;
+  image-rendering: pixelated;
+  image-rendering: crisp-edges;
+  -ms-interpolation-mode: nearest-neighbor;
+  image-rendering: -webkit-crisp-edges;
+  image-rendering: -moz-crisp-edges;
+  image-rendering: -o-crisp-edges;
+}
+
+
+
+@media screen and (max-width: 1000px) and (orientation:portrait) {
+  * {    -webkit-tap-highlight-color: transparent;  }
+  body,table{ font-size:39px; }
+  #Main { width:90%; font-size:46px; border-width:4px; }
+  #Under, #UnderUnder { width:100% }
+  .Opt { width:90%; font-size:46px; padding: 10px 8px; border-width:4px !important; }
+  #MenuBar,#Stats { width:90%; font-size: 34px; }
+  #maptile { width:25px; height:25px; line-height:25px; font-size: 34px; }
+  .mapM { box-shadow: 0px 0px 0px 8px var(--map-path) inset; }
+  .Direction,.DirectionBlocked { width:145px; height:115px; font-size: 47px; line-height:100px; margin:5px; border-width:4px !important; }
+  .markbutton { line-height:18px; font-size:18px; height: auto; width:auto; }
+  #mapbox,#navbox { margin: 0px 0px 55px 0px; }
+  #footer {font-size:36px; bottom:70px}
+  #Settings { height:120px; font-size:26px; }
+  .optnum {font-size:18px; }
+  
+  #monsterhead, #monsterbod  {    width:320px;  }
+  #imagespacer { height:400px; }
+  #monsterimagecontainer { max-width: 420px; }
+  #blackimage { height:415px; }  
+}
+
+@media screen and (min-width: 1000px), screen and (max-width: 1000px) and (orientation:landscape) {
+  body,table{  font-size:24px; }
+  #Main { width:47%; font-size:24px; }
+  .Opt { width:100%; font-size:24px;}
+  #MenuBar,#Stats { width:47%; font-size: 20px; }
+  .Opt:hover,.Direction:hover,.Opt.hov,.Direction.hov {
+    z-index:55555 !important;
+    background: var(--button-highlight);
+    color: var(--link-hover);
+    border-color: var(--link-hover);
+    box-shadow: 0px 0px 12px 5px var(--button-highlight);
+  }
+  .XOpt:hover,.XOpt.hov {
+    background: var(--x-highlight);
+    color: var(--x-hover);
+    border-color: var(--x-hover);
+    box-shadow: 0px 0px 12px 5px  var(--x-highlight);
+  }
+  .column > .Opt { width:49%; min-width:0px;}
+
+  
+}
+
+* {
+box-sizing: border-box; 
+max-height:1000000px;
+-webkit-text-size-adjust: none;
+-moz-text-size-adjust: none;
+-ms-text-size-adjust: none;
+-webkit-touch-callout: none;
+}
+
+a:link,a:visited,a:active {
+    color: var(--link-color);
+    text-decoration: none;
+}
+a:hover {
+    color: var(--link-hover);
+    text-decoration: none;
+}
+
+
+#speech {
+    font-family: "Courier New", Courier, monospace;
+    font-weight: bold;
+    color: var(--speech-color);
+}
+
+#tospeak {
+color: var(--gui-color);
+visibility:hidden;
+}
+
+#breedchart {
+  display:none;
+  background:#000;
+  color: #666;
+  position: absolute;
+  top: 0px; left: 0px;
+  bottom: 0px; right: 0px;
+  z-index:999999;
+  padding:30px
+}
+
+.pairblock {
+  display:inline-block;
+  line-height:12px;
+  width:12px; height:12px;
+  margin:0px; padding:0px;
+  overflow:hidden;
+  font-size:20px;
+  background:#111;
+  border: 1px solid #000;
+}
+.unbred { background:#333; }
+.caught { background:#181818; }
+.nopair { background:#000; }
+.bred { background:#AAA; }
+.pbA { border-color:#600; }
+.pbB { border-color:#060; }
+//.pbA.bred { background:#F33; }
+//.pbB.bred { background:#3F3; }
+//.pbA.nopair { background:#000; }
+//.pbB.nopair { background:#000; }
+.pbA.pbB { border-color:#880; }
+//.pbA.pbB.bred { background:#FF8; }
+
+
+
+</style>
+
+<!-- Global site tag (gtag.js) - Google Analytics -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=UA-31862023-8"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'UA-31862023-8');
+</script>
+
+</head>
+
+<body>
+<div id="breedchart" onclick="this.style.display='none';">
+</div>
+
+<div style="min-height:100%;  ">
+    <div id="Over"></div>
+    <div id="Stats" onclick='ToggleStats(); return false;'></div>
+    <div id="MenuBar">
+      <small><a href="#" onclick='ToggleStats(); return false;'>STATS &#9660;</a></small>
+      </div>
+    <div id="Main""><center>Loading...</center></div>
+    <center><div id="Under"></div></center>
+    <center><div id="UnderUnder"></div></center>
+    <center><div id="Settings">
+      <a href="#" onclick="ToggleMusic()" id="togmus" style="text-decoration:line-through">Toggle Music</a>
+       &#8226; 
+      <a href="#" onclick="ToggleColor()" id="togcol">Day Mode</a>
+       &#8226; 
+      <a href="#" onclick="deleteAllCookies()">Restart Game</a>
+    </div></center>
+</div>
+    <div id="footer">
+      
+      <span style="float:right;">
+      Created by <a href="http://www.twitter.com/neilcic" target="_blank">Neil Cicierega</a> &#8226;
+      <a href="https://patreon.com/neilc" target="_blank">Patreon</a>
+      &#8226;
+      <a href="https://ko-fi.com/neilcic" target="_blank">Ko-Fi</a>
+      &#8226;
+      <a href="https://paypal.me/neilcic" target="_blank">Paypal</a>
+      </span>
+      
+    </div>
+
+<script src="data.js?v=2.12" type="text/javascript"></script>
+<script src="game.js?v=2.12" type="text/javascript"></script>
+
+</body>
+
+</html>
